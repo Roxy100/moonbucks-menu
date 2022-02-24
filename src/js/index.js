@@ -7,9 +7,24 @@
 // - [X] 메뉴가 추가되고 나면, input은 빈 값으로 초기화한다.
 // - [X] 사용자 입력값이 빈 값이라면 추가되지 않는다.
 
+// TODO 메뉴 수정
+// - [X] 메뉴의 수정 버튼 클릭 이벤트를 받고, 메뉴 수정하는 모달창이 뜬다. ('prompt' 인터페이스 활용)
+// - [X] 모달창에서 신규메뉴명을 입력 받고, 확인버튼을 누르면 메뉴가 수정된다.
+
 const $ = (selector) => document.querySelector(selector);
 
 function App() {
+  $("#espresso-menu-list").addEventListener("click", (e) => {
+    if (e.target.classList.contains("menu-edit-button")) {
+      const $menuName = e.target.closest("li").querySelector(".menu-name");
+      const updatedMenuName = prompt(
+        "메뉴명을 수정하세요",
+        $menuName.innerText
+      );
+      $menuName.innerText = updatedMenuName;
+    }
+  });
+
   $("#espresso-menu-form").addEventListener("submit", (e) => {
     e.preventDefault();
   });
@@ -60,10 +75,6 @@ function App() {
 }
 
 App();
-
-// TODO 메뉴 수정
-// - [ ] 메뉴의 수정 버튼 클릭 이벤트를 받고, 메뉴 수정하는 모달창이 뜬다. ('prompt' 인터페이스 활용)
-// - [ ] 모달창에서 신규메뉴명을 입력 받고, 확인버튼을 누르면 메뉴가 수정된다.
 
 // TODO 메뉴 삭제
 // - [ ] 메뉴 삭제 버튼 클릭 이벤트를 받고, 메뉴 삭제 컨펌 모달창이 뜬다. ('confirm'인터페이스 활용)
