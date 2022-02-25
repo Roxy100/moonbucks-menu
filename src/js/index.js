@@ -1,7 +1,10 @@
 // step2 요구사항 구현을 위한 전략
 // TODO localStorage Read & Wright
-// - [ ] localStorage에 데이터를 저장한다.
-// - [ ] localStorage에 있는 데이터를 읽어온다.
+// - [] localStorage에 데이터를 저장한다.
+//  - [X] 메뉴를 추가할 때
+//  - [] 메뉴를 수정할 때
+//  - [] 메뉴를 삭제할 때
+// - [] localStorage에 있는 데이터를 읽어온다.
 
 // TODO 카테고리별 메뉴판 관리
 // - [ ] 에스프레소 메뉴판 관리
@@ -32,6 +35,8 @@ const store = {
 
 function App() {
   // 상태는 변하는 데이터를 의미. 이 앱에서 변하는 것이 무엇인가 - 메뉴명
+  this.menu = [];
+
   const updateMenuCount = () => {
     const menuCount = $("#espresso-menu-list").querySelectorAll("li").length;
     $(".menu-count").innerText = `총 ${menuCount}개`;
@@ -43,10 +48,13 @@ function App() {
       return;
     }
     const espressoMenuName = $("#espresso-menu-name").value;
-    const menuItemTemplate = (espressoMenuName) => {
-      return `
+    this.menu.push({ name: espressoMenuName });
+    store.setLocalStorage(this.menu);
+    const template = this.menu
+      .map((menuItem) => {
+        return `
         <li class="menu-list-item d-flex items-center py-2">
-          <span class="w-100 pl-2 menu-name">${espressoMenuName}</span>
+          <span class="w-100 pl-2 menu-name">${menuItem.name}</span>
           <button
           type="button"
           class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
@@ -60,11 +68,9 @@ function App() {
           삭제
           </button>
         </li>`;
-    };
-    $("#espresso-menu-list").insertAdjacentHTML(
-      "beforeend",
-      menuItemTemplate(espressoMenuName)
-    );
+      })
+      .join("");
+    $("#espresso-menu-list").innerHTML = template;
     updateMenuCount();
     $("#espresso-menu-name").value = "";
   };
@@ -106,4 +112,4 @@ function App() {
   });
 }
 
-App();
+const app = new App();
