@@ -3,13 +3,13 @@
 // - [X] 웹 서버를 띄운다.
 // - [X] 서버에 새로운 메뉴명을 추가될 수 있도록 요청한다.
 // - [XX] 서버에 카테고리별 메뉴리스트를 불러온다.
-// - [ ] 서버에 메뉴가 수정될 수 있도록 요청한다.
+// - [X] 서버에 메뉴가 수정될 수 있도록 요청한다.
 // - [ ] 서버에 메뉴의 품절상태가 토글될 수 있도록 요청한다.
 // - [ ] 서버에 메뉴가 삭제될 수 있도록 요청한다.
 
 // TODO 리팩터링 부분
-// - [XX] localStorage에 저장하는 로직은 지운다.
-// - [XX] fetch 비동기 api를 사용하는 부분을 async await을 사용하여 구현한다.
+// - [XXX] localStorage에 저장하는 로직은 지운다.
+// - [XXX] fetch 비동기 api를 사용하는 부분을 async await을 사용하여 구현한다.
 
 // TODO 사용자 경험
 // - [ ] API 통신이 실패하는 경우에 대해 사용자가 알 수 있게 alert으로 예외처리를 진행한다.
@@ -37,6 +37,22 @@ const MenuApi = {
       console.error("에러가 발생했습니다");
     }
   },
+  async updateMenu(category, name, menuId) {
+    const response = await fetch(
+      `${BASE_URL}/category/${category}/menu/${menuId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name }),
+      }
+    );
+    if (!response.ok) {
+      console.error("에러가 발생했습니다");
+    }
+    return response.json();
+  },
 };
 
 function App() {
@@ -59,9 +75,11 @@ function App() {
 
   const render = () => {
     const template = this.menu[this.currentCategory]
-      .map((menuItem, index) => {
+      .map((menuItem) => {
         return `
-      <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+      <li data-menu-id="${
+        menuItem.id
+      }" class="menu-list-item d-flex items-center py-2">
         <span class="w-100 pl-2 menu-name ${
           menuItem.soldOut ? "sold-out" : ""
         } ">${menuItem.name}</span>
@@ -111,12 +129,16 @@ function App() {
     $("#menu-name").value = "";
   };
 
-  const updateMenuName = (e) => {
+  const updateMenuName = async (e) => {
     const menuId = e.target.closest("li").dataset.menuId;
     const $menuName = e.target.closest("li").querySelector(".menu-name");
     const updatedMenuName = prompt("메뉴명을 수정하세요", $menuName.innerText);
-    this.menu[this.currentCategory][menuId].name = updatedMenuName;
-    store.setLocalStorage(this.menu);
+
+    await MenuApi.updateMenu(this.currentCategory, updatedMenuName, menuId);
+
+    this.menu[this.currentCategory] = await MenuApi.getAllMenuByCategory(
+      this.currentCategory
+    );
     render();
   };
 
